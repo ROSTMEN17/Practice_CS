@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Користувачі та домашні завдання</title>
+</head>
+<body>
+    <h2>Поточні користувачі</h2>
+    <div id="usersList"></div>
+
+    <h2>Додати користувача</h2>
+    <form id="addUserForm">
+        <label for="name">Ім'я:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="age">Вік:</label>
+        <input type="number" id="age" name="age" required><br><br>
+
+        <label for="class">Клас:</label>
+        <input type="text" id="class" name="class" required><br><br>
+
+        <button type="submit">Додати</button>
+    </form>
+
+    <h2>Додати домашнє завдання</h2>
+    <form id="addHomeworkForm">
+        <label for="title">Заголовок:</label>
+        <input type="text" id="title" name="title" required><br><br>
+
+        <label for="description">Опис:</label>
+        <input type="text" id="description" name="description" required><br><br>
+
+        <label for="due_date">Кінцевий термін:</label>
+        <input type="text" id="due_date" name="due_date" required><br><br>
+
+        <label for="student_id">ID студента:</label>
+        <input type="text" id="student_id" name="student_id" required><br><br>
+
+        <button type="submit">Додати</button>
+    </form>
+
+    <script>
+        
+        async function fetchAndDisplayUsers() {
+            const response = await fetch('/api/users');
+            const users = await response.json();
+
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = ''; 
+
+            users.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.innerHTML = `
+                    <p>Ім'я: ${user.name}</p>
+                    <p>Вік: ${user.age}</p>
+                    <p>Клас: ${user.class}</p>
+                    <button onclick="editUser('${user._id}')">Редагувати</button>
+                `;
+                usersList.appendChild(userElement);
+            });
+        }
+
+        async function editUser(userId) {
+            const newName = prompt('Введіть нове ім\'я:');
+            const newAge = prompt('Введіть новий вік:');
+            const newClass = prompt('Введіть новий клас:');
+
+            try {
+                const response = await fetch(`/api/users/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name: newName, age: newAge, class: newClass })
+                });
+
+                if (response.ok) {
+                    alert('Користувача успішно відредаговано!');
+                    fetchAndDisplayUsers(); 
+                } else {
+                    throw new Error('Не вдалося відредагувати користувача');
+                }
+            } catch (error) {
+                console.error('Error editing user:', error.message);
+                alert('Не вдалося відредагувати користувача. Будь ласка спробуйте ще раз.');
+            }
+        }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const addUserForm = document.getElementById('addUserForm');
+        const addHomeworkForm = document.getElementById('addHomeworkForm');
+
+        addUserForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(addUserForm);
+            const userData = {
+                name: formData.get('name'),
+                age: formData.get('age'),
+                class: formData.get('class')
+            };
+
+            try {
+                const response = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                const data = await response.json();
+                console.log('User added:', data);
+                
+            } catch (error) {
+                console.error('Error adding user:', error);
+                
+            }
+        });
+
+        addHomeworkForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(addHomeworkForm);
+            const homeworkData = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                due_date: formData.get('due_date'),
+                student_id: formData.get('student_id')
+            };
+
+            try {
+                const response = await fetch('/api/homework', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(homeworkData)
+                });
+
+                const data = await response.json();
+                console.log('Homework added:', data);
+            } catch (error) {
+                console.error('Error adding homework:', error);
+            }
+        });
+    });
+    </script>
+</body>
+</html>  

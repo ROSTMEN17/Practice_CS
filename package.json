@@ -1,0 +1,18 @@
+{
+  "name": "school-management-system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rostislav Berezovskyi",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.3",
+    "mongodb": "^6.4.0",
+    "mongodb-core": "^3.2.7",
+    "mongoose": "^8.2.1",
+    "nodemon": "^3.1.0"
+  }
+}
